@@ -1,58 +1,50 @@
-name : "Terraform"
+name: "Terraform"
 
-#.github/workflows folder and terraform.yaml are created manually
-#this is where the triggers go like cron/push etc
-#executed on gitserver 500mb and month  Github action takes of all from repo file and pastes into remote server.
-#Steps 
-# GA copies from repo
-#paste to remote server (ubuntu windows, etc)
-#execute file on server maintained by git
+# .github/workflows/ folder and terraform.yaml are created manually
+# This workflow triggers on a push to the main branch.
 
-on: 
+on:
   push:
     branches:
       - main
 
 jobs:
-  terraform: 
+  terraform:
     name: "Terraform"
-    runs-on: ubuntu-lastest
+    runs-on: ubuntu-latest
 
-  env: #these are paths to credentials folder
-    aws_access_key_id: ${{secrets.AWS_ACCESS_KEY_ID}}
-    aws_secret_access_key: ${{secrets.aws_secret_access_key}}
-    AWS_SESSION_TOKEN: ${{secrets.AWS_SESSION_TOKEN}}
+    env: # These are paths to credentials folder
+      aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
+    defaults:
+      run:
+        working-directory: src
 
-  defaults:
-    run:
-      working-directory: src
-  steps: 
-    - name: Checkout #this steps clones this git folder into the remote git server/workspace defined in the jobs/terraform/runs-on
-      uses: actions/checkout@v2 #step 1 clones repo to git server using https://github.com/actions/checkout
+    steps:
+      - name: Checkout # This step clones the repository into the remote GitHub Actions runner workspace
+        uses: actions/checkout@v2
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform ##step2 instals terraform with https://github.com/hashicorp/setup-terraform
-      with:
-        terraform_version: "1.0.1"
-        terraform_wrapper: false
+      - name: Setup Terraform # Install Terraform on the runner
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "1.0.1"
+          terraform_wrapper: false
 
-    - name: Terraform initialise
-      id : init
-      run : terraform init
+      - name: Terraform initialise # Initialize the Terraform backend
+        id: init
+        run: terraform init
 
-    - name: Terraform planning
-      id : plan
-      run : terraform plan
+      - name: Terraform planning # Plan the Terraform deployment
+        id: plan
+        run: terraform plan
 
-    - name: Terraform infrastructure
-      id : apply
-      run : terraform apply --auto-approve
+      - name: Terraform apply # Apply the Terraform infrastructure
+        id: apply
+        run: terraform apply --auto-approve
 
-    # add condition for belew block like destroy after x days
-    # - name: Terraform destroy
-    #   id : destroy
-    #   run : terraform destroy --auto-approve
-
-
-
+      # Uncomment the below block if you want to destroy the infrastructure after X days
+      # - name: Terraform destroy
+      #   id: destroy
+      #   run: terraform destroy --auto-approve
