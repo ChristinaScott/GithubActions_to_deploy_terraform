@@ -1,0 +1,58 @@
+name : "Terraform"
+
+#.github/workflows folder and terraform.yaml are created manually
+#this is where the triggers go like cron/push etc
+#executed on gitserver 500mb and month  Github action takes of all from repo file and pastes into remote server.
+#Steps 
+# GA copies from repo
+#paste to remote server (ubuntu windows, etc)
+#execute file on server maintained by git
+
+on: 
+  push:
+    branches:
+      -main
+
+jobs:
+  terraform: 
+  name: "Terraform"
+  runs-on: ubuntu-lastest
+
+  env: #these are paths to credentials folder
+    aws_access_key_id: ${{secrets.AWS_ACCESS_KEY_ID}}
+    aws_secret_access_key: ${{secrets.aws_secret_access_key}}
+    AWS_SESSION_TOKEN: ${{secrets.AWS_SESSION_TOKEN}}
+
+
+  defaults:
+    run:
+      working-directory: src
+  steps: 
+    - name: Checkout #this steps clones this git folder into the remote git server/workspace defined in the jobs/terraform/runs-on
+      uses: actions/checkout@v2 #step 1 clones repo to git server using https://github.com/actions/checkout
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform ##step2 instals terraform with https://github.com/hashicorp/setup-terraform
+      with:
+        terraform_version: "1.0.1"
+        terraform_wrapper: false
+
+    - name: Terraform initialise
+      id : init
+      run : terraform init
+
+    - name: Terraform planning
+      id : plan
+      run : terraform plan
+
+    - name: Terraform infrastructure
+      id : apply
+      run : terraform apply --auto-approve
+
+    # add condition for belew block like destroy after x days
+    # - name: Terraform destroy
+    #   id : destroy
+    #   run : terraform destroy --auto-approve
+
+
+
