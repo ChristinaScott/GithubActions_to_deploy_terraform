@@ -40,11 +40,11 @@ jobs:
         id: plan
         run: terraform plan
 
-      - name: Terraform apply # Apply the Terraform infrastructure
-        id: apply
-        run: terraform apply --auto-approve
+      # - name: Terraform apply # Apply the Terraform infrastructure
+      #   id: apply
+      #   run: terraform apply --auto-approve
 
       # Uncomment the below block if you want to destroy the infrastructure after X days
-      # - name: Terraform destroy
-      #   id: destroy
-      #   run: terraform destroy --auto-approve
+      - name: Terraform destroy
+        id: destroy
+        run: terraform destroy --auto-approve
