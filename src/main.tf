@@ -21,7 +21,7 @@ resource "aws_vpc" "my_vpc" {
 resource "aws_subnet" "public_subnet" {
   vpc_id                  = aws_vpc.my_vpc.id # resource_keysyntax. logicalId. Id  = !Ref 
   cidr_block              = "10.0.1.0/24"
-  availability_zone       = "us-west-2"
+  availability_zone       = "us-west-2b"
   map_public_ip_on_launch = true
   tags = {
     Name = "Christina-PublicSubnet"
@@ -86,7 +86,7 @@ resource "aws_instance" "my_ec2" {
   subnet_id              = aws_subnet.public_subnet.id
   vpc_security_group_ids = [aws_security_group.my_sg.id]
   tags = {
-    Name = "Chrisiina-Ec2Instance"
+    Name = "Chrisina-Ec2Instance"
   }
 }
 
